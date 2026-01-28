@@ -9,25 +9,21 @@ import {
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { Button } from '@/app/ui/button';
-import { updateInvoice, State } from '@/app/lib/actions';
+import { State } from '@/app/lib/actions';
 import { useActionState } from 'react';
 
 export default function EditInvoiceForm({
   invoice,
   customers,
+  updateAction,
 }: {
   invoice: InvoiceForm;
   customers: CustomerField[];
+  updateAction: (prevState: State, formData: FormData) => Promise<State>;
 }) {
   const initialState: State = { message: null, errors: {} };
 
-  // ✅ Correct: get the action by calling the function
-  const updateInvoiceWithId = updateInvoice(invoice.id);
-
-  const [state, formAction] = useActionState(
-    updateInvoiceWithId,
-    initialState
-  );
+  const [state, formAction] = useActionState(updateAction, initialState);
 
   return (
     <form action={formAction}>

@@ -86,24 +86,11 @@ export async function createInvoice(
    UPDATE INVOICE (✅ FIXED)
 ========================= */
 
-// Support both the curried server-action style used with `useActionState`
-// and older direct-call signatures like `updateInvoice(id, formData)`.
-export function updateInvoice(id: string): ((
-  prevState: State,
-  formData: FormData,
-) => Promise<State>);
-export function updateInvoice(id: string, formData: FormData): Promise<State>;
-export function updateInvoice(
-  id: string,
-  prevState: State,
-  formData: FormData,
-): Promise<State>;
-export function updateInvoice(
-  id: string,
-  prevStateOrFormData?: State | FormData,
-  maybeFormData?: FormData,
-) {
-  async function coreUpdate(_id: string, formData: FormData) {
+export async function updateInvoice(id: string) {
+  return async function (
+    prevState: State,
+    formData: FormData,
+  ): Promise<State> {
     const validatedFields = UpdateInvoice.safeParse({
       customerId: formData.get('customerId'),
       amount: formData.get('amount'),
@@ -126,7 +113,7 @@ export function updateInvoice(
         SET customer_id = ${customerId},
             amount = ${amountInCents},
             status = ${status}
-        WHERE id = ${_id}
+        WHERE id = ${id}
       `;
     } catch (error) {
       console.error(error);
@@ -135,30 +122,7 @@ export function updateInvoice(
 
     revalidatePath('/dashboard/invoices');
     redirect('/dashboard/invoices');
-  }
-
-  // Called as `updateInvoice(id)` -> return curried action
-  if (typeof prevStateOrFormData === 'undefined') {
-    return async function (
-      _prevState: State,
-      formData: FormData,
-    ): Promise<State> {
-      const res = await coreUpdate(id, formData);
-      // If coreUpdate returned a State object, return it; otherwise return {} as State
-      return (res as State) ?? ({} as State);
-    };
-  }
-
-  // Called as `updateInvoice(id, formData)` (legacy) -> prevStateOrFormData is FormData
-  if (
-    typeof (prevStateOrFormData as FormData).get === 'function' &&
-    maybeFormData === undefined
-  ) {
-    return coreUpdate(id, prevStateOrFormData as FormData) as Promise<State>;
-  }
-
-  // Called as `updateInvoice(id, prevState, formData)` -> handle directly
-  return coreUpdate(id, maybeFormData as FormData) as Promise<State>;
+  };
 }
 
 /* =========================
