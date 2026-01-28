@@ -92,6 +92,7 @@ export function updateInvoice(id: string): ((
   prevState: State,
   formData: FormData,
 ) => Promise<State>);
+export function updateInvoice(id: string, formData: FormData): Promise<State>;
 export function updateInvoice(
   id: string,
   prevState: State,
