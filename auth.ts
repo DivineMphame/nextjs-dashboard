@@ -6,8 +6,7 @@ import type { User } from '@/app/lib/definitions';
 import bcrypt from 'bcrypt';
 import postgres from 'postgres';
  
-const _POSTGRES_CONN = process.env.POSTGRES_URL ?? process.env.DATABASE_URL;
-const sql = postgres(_POSTGRES_CONN!, { ssl: 'require' });
+const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
  
 async function getUser(email: string): Promise<User | undefined> {
   try {
