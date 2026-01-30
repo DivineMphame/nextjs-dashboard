@@ -7,7 +7,8 @@ import postgres from 'postgres';
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+const _POSTGRES_CONN = process.env.POSTGRES_URL ?? process.env.DATABASE_URL;
+const sql = postgres(_POSTGRES_CONN!, { ssl: 'require' });
 
 /* =========================
    INVOICE SCHEMAS
