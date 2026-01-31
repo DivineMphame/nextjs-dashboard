@@ -6,7 +6,13 @@ import type { User } from '@/app/lib/definitions';
 import bcrypt from 'bcrypt';
 import postgres from 'postgres';
  
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+const _DB_URL = process.env.POSTGRES_URL ?? process.env.DATABASE_URL;
+if (!_DB_URL) {
+  console.error('No database URL found in POSTGRES_URL or DATABASE_URL');
+  throw new Error('Missing database connection string. Set POSTGRES_URL or DATABASE_URL.');
+}
+
+const sql = postgres(_DB_URL, { ssl: 'require' });
  
 async function getUser(email: string): Promise<User | undefined> {
   try {
